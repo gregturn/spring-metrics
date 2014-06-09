@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.metrics.Collect;
 import org.springframework.metrics.EnableMetrics;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 @EnableAutoConfiguration
-@EnableMetrics(basePackages = {"com.greglturnquist"})
+@EnableMetrics
 @EnableScheduling
 public class Application {
 
@@ -33,6 +34,9 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+        for (String beanName : ctx.getBeanDefinitionNames()) {
+            log.info(beanName);
+        }
     }
 }

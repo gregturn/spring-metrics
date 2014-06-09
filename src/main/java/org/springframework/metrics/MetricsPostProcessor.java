@@ -26,10 +26,6 @@ public class MetricsPostProcessor implements BeanPostProcessor, InitializingBean
 
         this.metricsRepository = metricsRepository;
         this.basePackages = basePackages;
-
-        for (String basePackage : basePackages) {
-            log.info("Wills can " + basePackage);
-        }
     }
 
     @Override
@@ -48,12 +44,8 @@ public class MetricsPostProcessor implements BeanPostProcessor, InitializingBean
 
         for (String basePackage : basePackages) {
 
-            log.info(s + " is in package " + o.getClass().getPackage().getName());
-            log.info("The package we are checking against is " + basePackage);
-
             if (o.getClass().getPackage().getName().startsWith(basePackage)) {
                 validForScanning = true;
-                log.info(s + " is in " + basePackage + " so we'll register it for metric scanning.");
                 break;
             }
         }
@@ -65,6 +57,12 @@ public class MetricsPostProcessor implements BeanPostProcessor, InitializingBean
                 beanType = ClassUtils.getUserClass(o);
             } else {
                 beanType = o.getClass();
+            }
+
+            Collect classLevel = AnnotationUtils.getAnnotation(beanType, Collect.class);
+
+            if (classLevel != null) {
+                metricsRepository.register(o);
             }
 
             for (Field field : beanType.getDeclaredFields()) {
@@ -80,7 +78,6 @@ public class MetricsPostProcessor implements BeanPostProcessor, InitializingBean
 
     @Override
     public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
-
         return o;
     }
 }

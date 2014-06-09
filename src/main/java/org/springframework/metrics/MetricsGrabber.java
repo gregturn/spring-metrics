@@ -19,9 +19,7 @@ public class MetricsGrabber {
 
     @Scheduled(fixedRate = 1000L)
     public void grabMetrics() {
-        log.info("Grab another batch of metrics...");
         for (Metric metric : metricsRepository.getRegisteredMetrics()) {
-            log.info("Reading " + metric.getName() + " yielded " + metric.read());
             metricsPublisher.publish(new MetricReport(metric.getName(), metric.read()));
         }
     }
